@@ -7,29 +7,36 @@ import { Button } from "@/components/ui/button"
 import { Download } from "lucide-react"
 
 const teamMembers = [
+  
   {
-    name: "Jane Doe",
-    role: "CEO & Lead Architect",
-    image: "/portrait-of-a-woman--professional--smiling.jpg",
-    resume: "/resumes/jane-doe-resume.pdf",
+    name: "Arjun Sharma",
+    role: "Full Stack Developer",
+    image: "/portrait-of-a-man--developer--smiling.jpg",
+    resume: "/resumes/arjun-sharma-resume.pdf",
   },
   {
-    name: "John Smith",
-    role: "Head of Development",
-    image: "/portrait-of-a-man--professional--smiling.jpg",
-    resume: "/resumes/john-smith-resume.pdf",
+    name: "Adarsh Lakhanpal",
+    role: "Full Stack Developer",
+    image: "/portrait-of-a-man--developer--smiling2.jpg",
+    resume: "/resumes/adarsh-lakhanpal-resume.pdf",
   },
   {
-    name: "Emily White",
-    role: "UI/UX Designer",
-    image: "/portrait-of-a-woman--creative--smiling.jpg",
-    resume: "/resumes/emily-white-resume.pdf",
+    name: "Gurpreet Singh",
+    role: "iOS Developer",
+    image: "/portrait-of-a-man--ios--smiling.jpg",
+    resume: "/resumes/gurpreet-singh-resume.pdf",
   },
   {
-    name: "David Green",
-    role: "Cloud Engineer",
-    image: "/portrait-of-a-man--technical--smiling.jpg",
-    resume: "/resumes/david-green-resume.pdf",
+    name: "Karan Sharma",
+    role: "Data Analytics",
+    image: "/portrait-of-a-man--analytics--smiling.jpg",
+    resume: "/resumes/karan-sharma-resume.pdf",
+  },
+  {
+    name: "Gaurav Sharma",
+    role: "Data Analytics",
+    image: "/portrait-of-a-man--analytics--smiling2.jpg",
+    resume: "/resumes/gaurav-sharma-resume.pdf",
   },
 ]
 
@@ -47,11 +54,8 @@ export function TeamSection() {
           transition={{ duration: 0.8 }}
           className="text-center space-y-4 mb-16"
         >
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium">
-            Our Team
-          </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-balance">
-            Meet Our <span className="text-primary">Experts</span>
+            Meet Our <span className="text-primary">Team</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
             We are a passionate group of professionals dedicated to delivering exceptional IT solutions.
@@ -76,8 +80,12 @@ export function TeamSection() {
                 height={120}
                 className="rounded-full object-cover mb-4 border-2 border-primary/50"
               />
-              <h3 className="text-xl font-semibold text-foreground mb-1">{member.name}</h3>
-              <p className="text-sm text-muted-foreground mb-4">{member.role}</p>
+              <h3 className="text-xl font-semibold text-foreground mb-1">
+                {member.name}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                {member.role}
+              </p>
               <Button asChild variant="outline" className="w-full bg-transparent">
                 <a href={member.resume} download>
                   <Download className="w-4 h-4 mr-2" />

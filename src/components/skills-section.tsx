@@ -1,5 +1,4 @@
 "use client"
-
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useRef } from "react"
@@ -11,14 +10,15 @@ import {
   Code as Node,
   BathIcon as Python,
   Database,
-  Cloud,
-  Dock as Docker,
-  TableProperties as Kubernetes,
-  GitBranch,
+  BarChart as PowerBI,
+  PieChart as Tableau,
+  Network,
   Smartphone,
   Palette,
-  Network,
   Shield,
+  Braces as Django,
+  SmartphoneCharging as Kotlin,
+  Badge as Swift,
 } from "lucide-react"
 
 const skillCategories = [
@@ -35,27 +35,27 @@ const skillCategories = [
     title: "Backend Technologies",
     skills: [
       { name: "Node.js", icon: Node },
-      { name: "Python", icon: Python },
+      { name: "Django", icon: Django },
       { name: "PostgreSQL", icon: Database },
       { name: "MongoDB", icon: Database },
     ],
   },
   {
-    title: "Cloud & DevOps",
-    skills: [
-      { name: "AWS", icon: Cloud },
-      { name: "Docker", icon: Docker },
-      { name: "Kubernetes", icon: Kubernetes },
-      { name: "CI/CD", icon: GitBranch },
-    ],
-  },
-  {
-    title: "Mobile & Others",
+    title: "Mobile Technologies",
     skills: [
       { name: "React Native", icon: Smartphone },
       { name: "Flutter", icon: Palette },
-      { name: "GraphQL", icon: Network },
-      { name: "Cybersecurity", icon: Shield },
+      { name: "Kotlin", icon: Kotlin },
+      { name: "Swift", icon: Swift },
+    ],
+  },
+  {
+    title: "Data & Analytics",
+    skills: [
+      { name: "Python", icon: Python },
+      { name: "SQL", icon: Database },
+      { name: "Power BI", icon: PowerBI },
+      { name: "Tableau", icon: Tableau },
     ],
   },
 ]
@@ -81,8 +81,9 @@ export function SkillsSection() {
             Technologies We <span className="text-primary">Master</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
-            Our team stays at the forefront of technology, continuously learning and mastering the latest tools and
-            frameworks to deliver cutting-edge solutions.
+            Our team stays at the forefront of technology, continuously learning
+            and mastering the latest tools and frameworks to deliver
+            cutting-edge solutions.
           </p>
         </motion.div>
 
@@ -96,7 +97,9 @@ export function SkillsSection() {
               transition={{ delay: categoryIndex * 0.2, duration: 0.8 }}
               className="space-y-6"
             >
-              <h3 className="text-xl font-semibold text-foreground mb-4">{category.title}</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-4">
+                {category.title}
+              </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {category.skills.map((skill, skillIndex) => {
                   const Icon = skill.icon
@@ -113,7 +116,9 @@ export function SkillsSection() {
                       className="flex flex-col items-center justify-center p-4 bg-card/50 rounded-lg border border-border/30 text-center shadow-sm hover:shadow-md transition-all duration-300"
                     >
                       <Icon className="w-8 h-8 text-primary mb-2" />
-                      <span className="text-sm font-medium text-foreground">{skill.name}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {skill.name}
+                      </span>
                     </motion.div>
                   )
                 })}

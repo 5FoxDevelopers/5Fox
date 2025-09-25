@@ -22,20 +22,20 @@ const services = [
     features: ["React Native", "Flutter", "Native iOS/Android", "App Store Deployment"],
     color: "from-green-500 to-emerald-500",
   },
-  {
-    icon: Cloud,
-    title: "Cloud Solutions",
-    description: "Scalable cloud infrastructure and migration services.",
-    features: ["AWS & Azure", "DevOps & CI/CD", "Microservices", "Container Orchestration"],
-    color: "from-purple-500 to-violet-500",
-  },
-  {
-    icon: Shield,
-    title: "Cybersecurity",
-    description: "Comprehensive security solutions to protect your digital assets.",
-    features: ["Security Audits", "Penetration Testing", "Compliance", "24/7 Monitoring"],
-    color: "from-red-500 to-orange-500",
-  },
+  // {
+  //   icon: Cloud,
+  //   title: "Cloud Solutions",
+  //   description: "Scalable cloud infrastructure and migration services.",
+  //   features: ["AWS & Azure", "DevOps & CI/CD", "Microservices", "Container Orchestration"],
+  //   color: "from-purple-500 to-violet-500",
+  // },
+  // {
+  //   icon: Shield,
+  //   title: "Cybersecurity",
+  //   description: "Comprehensive security solutions to protect your digital assets.",
+  //   features: ["Security Audits", "Penetration Testing", "Compliance", "24/7 Monitoring"],
+  //   color: "from-red-500 to-orange-500",
+  // },
   {
     icon: Database,
     title: "Data Analytics",
@@ -43,13 +43,13 @@ const services = [
     features: ["Big Data Processing", "Machine Learning", "Business Intelligence", "Data Visualization"],
     color: "from-indigo-500 to-blue-500",
   },
-  {
-    icon: Cog,
-    title: "IT Consulting",
-    description: "Strategic technology consulting to optimize your IT infrastructure.",
-    features: ["Digital Transformation", "Technology Strategy", "Process Optimization", "Training & Support"],
-    color: "from-orange-500 to-red-500",
-  },
+  // {
+  //   icon: Cog,
+  //   title: "IT Consulting",
+  //   description: "Strategic technology consulting to optimize your IT infrastructure.",
+  //   features: ["Digital Transformation", "Technology Strategy", "Process Optimization", "Training & Support"],
+  //   color: "from-orange-500 to-red-500",
+  // },
 ]
 
 export function ServicesSection() {
@@ -138,7 +138,7 @@ export function ServicesSection() {
         </div>
 
         {/* CTA */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.8, duration: 0.8 }}
@@ -151,7 +151,7 @@ export function ServicesSection() {
             Get Custom Quote
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   )

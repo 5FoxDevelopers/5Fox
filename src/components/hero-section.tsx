@@ -60,21 +60,21 @@ export function HeroSection() {
             transition={{ delay: 0.8, duration: 0.8 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button
+            {/* <Button
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg font-semibold group"
             >
               Get Started
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               variant="outline"
               size="lg"
               className="px-8 py-6 text-lg font-semibold group border-primary/20 hover:border-primary/40 bg-transparent"
             >
               <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
               Watch Demo
-            </Button>
+            </Button> */}
           </motion.div>
 
           {/* Feature Icons */}
