@@ -11,7 +11,11 @@ export const metadata: Metadata = {
   title: "5fox - IT Services & Solutions",
   description:
     "Transform your business with innovative IT solutions. Web development, mobile apps, cloud services, cybersecurity, and more.",
-  generator: "v0.app",
+    icons: {
+    icon: '/5Fox.jpg',
+    shortcut: '/5Fox.jpg',
+    apple: '/5Fox.jpg',
+  },
 }
 
 export default function RootLayout({
