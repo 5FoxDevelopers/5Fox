@@ -21,6 +21,12 @@ const teamMembers = [
     resume: "/resumes/adarsh-lakhanpal-resume.pdf",
   },
   {
+    name: "Arshdeep Singh",
+    role: "Full Stack Developer",
+    image: "/portrait-of-a-man--developer--smiling2.jpg",
+    resume: "/resumes/adarsh-lakhanpal-resume.pdf",
+  },
+  {
     name: "Gurpreet Singh",
     role: "iOS Developer",
     image: "/portrait-of-a-man--ios--smiling.jpg",

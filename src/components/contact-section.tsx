@@ -31,7 +31,7 @@ const contactFormSchema = z.object({
     .min(10, "Message must be at least 10 characters")
     .max(1000, "Message must be less than 1000 characters"),
   contactMethod: z.enum(["email", "phone", "both"], {
-    required_error: "Please select a preferred contact method",
+    message: "Please select a preferred contact method",
   }),
 })
 
