@@ -45,6 +45,8 @@ export function MottoSection() {
     },
   }
 
+  const MotionButton = motion(Button);
+
   return (
     <section className="py-24 bg-gradient-to-br from-background via-primary/5 to-background relative overflow-hidden" ref={ref}>
       {/* Background Elements */}
@@ -149,17 +151,17 @@ export function MottoSection() {
           {/* CTA */}
           <motion.div variants={itemVariants} className="pt-12">
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
+              <MotionButton
                 size="lg" 
                 className="px-8 py-4 text-lg font-semibold group"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Start Your Journey
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button>
+              </MotionButton>
               
-              <Button 
+              <MotionButton
                 variant="outline" 
                 size="lg" 
                 className="px-8 py-4 text-lg font-semibold hover:bg-primary/5 hover:border-primary/30"
@@ -167,7 +169,7 @@ export function MottoSection() {
                 whileTap={{ scale: 0.95 }}
               >
                 Explore Our Work
-              </Button>
+              </MotionButton>
             </div>
             
             <p className="text-sm text-muted-foreground mt-6">
