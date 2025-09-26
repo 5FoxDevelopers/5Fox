@@ -44,10 +44,9 @@ export function IntroSection() {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
-      y: 0,
       transition: {
-        duration: 0.8,
-        ease: "easeOut",
+         staggerChildren: 0.2,
+        duration: 0.6,
       },
     },
   }
@@ -56,10 +55,9 @@ export function IntroSection() {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,
-      scale: 1,
       transition: {
+         staggerChildren: 0.2,
         duration: 0.6,
-        ease: "easeOut",
       },
     },
   }
@@ -109,10 +107,13 @@ export function IntroSection() {
                   asChild
                   size="lg"
                   className="group"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
-                  <motion.a href="#contact" className="inline-flex items-center space-x-3">
+                  <motion.a 
+                    href="#contact" 
+                    className="inline-flex items-center space-x-3"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <span>Learn More About Us</span>
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </motion.a>

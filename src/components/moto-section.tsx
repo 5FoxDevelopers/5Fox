@@ -29,8 +29,8 @@ export function MottoSection() {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.8,
-        ease: "easeOut",
+        staggerChildren: 0.1,
+        duration: 0.6,
       },
     },
   }
@@ -40,8 +40,7 @@ export function MottoSection() {
       y: [-10, 10, -10],
       transition: {
         duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
+       staggerChildren: 0.1,
       },
     },
   }
