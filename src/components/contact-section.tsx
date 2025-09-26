@@ -49,8 +49,8 @@ const contactInfo = [
     icon: Phone,
     title: "Call Us", 
     description: "Speak with our team",
-    value: "+91 78144 05105",
-    link: "tel:+917814405105",
+    value: "+91 84375 16789",
+    link: "tel:+918437516789",
   },
 
 ]

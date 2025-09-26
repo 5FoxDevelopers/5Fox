@@ -102,7 +102,7 @@ export function IntroSection() {
                 </p>
               </div>
 
-              <motion.div variants={itemVariants}>
+              {/* <motion.div variants={itemVariants}>
                 <Button 
                   asChild
                   size="lg"
@@ -118,7 +118,7 @@ export function IntroSection() {
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </motion.a>
                 </Button>
-              </motion.div>
+              </motion.div> */}
             </motion.div>
           </motion.div>
 

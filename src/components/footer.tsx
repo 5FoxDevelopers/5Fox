@@ -12,7 +12,6 @@ const footerLinks = {
     "Web Development",
     "Mobile Development",
     "Data Analytics",
-    "IT Consulting",
   ],
   company: ["About Us", "Our Team", "Careers", "Blog", "Case Studies", "Contact"],
   resources: ["Documentation", "Help Center", "Privacy Policy", "Terms of Service", "Cookie Policy", "Sitemap"],
@@ -65,7 +64,7 @@ export function Footer() {
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <Phone className="w-4 h-4 text-primary" />
-                  <span>+91 78144-05105</span>
+                  <span>+91 84375-16789</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <MapPin className="w-4 h-4 text-primary" />

@@ -75,9 +75,9 @@ export function Navbar() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            {/* <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
               Get Started
-            </Button>
+            </Button> */}
           </div>
 
           {/* Mobile Menu Button */}

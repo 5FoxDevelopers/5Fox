@@ -223,13 +223,13 @@ export function ProjectsSection() {
                 <p className="text-muted-foreground">
                   Let's discuss how we can bring your ideas to life with our expertise and proven track record.
                 </p>
-                <Button
+                {/* <Button
                   size="lg"
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 font-semibold group"
                 >
                   Start Your Project
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
           </Card>
