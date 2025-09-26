@@ -11,8 +11,6 @@ const footerLinks = {
   services: [
     "Web Development",
     "Mobile Development",
-    "Cloud Solutions",
-    "Cybersecurity",
     "Data Analytics",
     "IT Consulting",
   ],
@@ -63,20 +61,19 @@ export function Footer() {
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <Mail className="w-4 h-4 text-primary" />
-                  <span>hello@5fox.com</span>
+                  <span>5foxdevelopers@gmail.com</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <Phone className="w-4 h-4 text-primary" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>+91 78144-05105</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                   <MapPin className="w-4 h-4 text-primary" />
-                  <span>Silicon Valley, CA</span>
+                  <span>Amritsar, Punjab</span>
                 </div>
               </div>
             </motion.div>
 
-            {/* Services */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -100,7 +97,6 @@ export function Footer() {
               </ul>
             </motion.div>
 
-            {/* Company */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -124,7 +120,6 @@ export function Footer() {
               </ul>
             </motion.div>
 
-            {/* Newsletter */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -161,7 +156,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}

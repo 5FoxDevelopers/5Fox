@@ -7,6 +7,8 @@ import { ProjectsSection } from "@/components/projects-section"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
 import { TeamSection } from "@/components/team-section" 
+import { MottoSection } from "@/components/moto-section"
+import { PricingPage } from "@/components/pricing-section"
 
 export default function HomePage() {
   return (
@@ -16,8 +18,9 @@ export default function HomePage() {
       <IntroSection />
       <ServicesSection />
       <SkillsSection />
-      {/* <TeamSection />  */}
+      <MottoSection/>
       <ProjectsSection />
+      {/* <PricingPage/> */}
       <ContactSection />
       <Footer />
     </main>
