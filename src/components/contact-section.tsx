@@ -16,8 +16,9 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { db } from "@/lib/firebase"
 import { collection, addDoc, Timestamp } from "firebase/firestore"
+import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check"
 
-// Zod validation schema
+// Zod validation schema (same as before)
 const contactFormSchema = z.object({
   name: z.string()
     .min(2, "Name must be at least 2 characters")
@@ -43,22 +44,22 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email Us",
-    description: "Get in touch via email",
+    description: "Get in touch via email", 
     value: "5foxdevelopers@gmail.com",
     link: "mailto:5foxdevelopers@gmail.com",
   },
   {
     icon: Phone,
-    title: "Call Us", 
+    title: "Call Us",
     description: "Speak with our team",
-    value: "+91 84375 16789",
+    value: "+91 84375 16789", 
     link: "tel:+918437516789",
   },
 ]
 
 const contactMethods = [
   { value: "email", label: "Email" },
-  { value: "phone", label: "Phone" }, 
+  { value: "phone", label: "Phone" },
   { value: "both", label: "Both" },
 ]
 
@@ -67,13 +68,61 @@ export function ContactSection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | 'app-check-failed' | null>(null)
-  const [appCheckEnabled, setAppCheckEnabled] = useState(false)
+  const [appCheckInitialized, setAppCheckInitialized] = useState(false)
+  const [appCheckError, setAppCheckError] = useState<string | null>(null)
   const dbRef = collection(db, "contacts")
 
-  // Check if App Check is enabled
+  // Initialize App Check properly
   useEffect(() => {
-    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-      setAppCheckEnabled(true)
+    const initAppCheck = async () => {
+      try {
+        const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+        
+        if (!siteKey) {
+          console.warn('reCAPTCHA site key not found in environment variables')
+          setAppCheckError('reCAPTCHA not configured')
+          return
+        }
+
+        // Check if we're in development
+        const isDevelopment = process.env.NODE_ENV === 'development'
+        
+        if (isDevelopment) {
+          // Enable debug mode for development
+          (window as any).NEXT_PUBLIC_APPCHECK_DEBUG_TOKEN = true
+          console.log('App Check debug mode enabled for development')
+        }
+
+        // Initialize App Check
+        const { app } = await import('@/lib/firebase')
+        const appCheck = initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider(siteKey),
+          isTokenAutoRefreshEnabled: true,
+        })
+
+        // Test getting a token to verify it's working
+        const token = await getToken(appCheck)
+        if (token) {
+          setAppCheckInitialized(true)
+          console.log('App Check initialized successfully')
+        } else {
+          throw new Error('Failed to get App Check token')
+        }
+
+      } catch (error: any) {
+        console.error('App Check initialization failed:', error)
+        setAppCheckError(error.message)
+        
+        // Don't block form submission in development
+        if (process.env.NODE_ENV === 'development') {
+          setAppCheckInitialized(true)
+        }
+      }
+    }
+
+    // Only initialize on client side
+    if (typeof window !== 'undefined') {
+      initAppCheck()
     }
   }, [])
 
@@ -101,8 +150,7 @@ export function ContactSection() {
     try {
       setSubmitStatus(null)
 
-      // Firebase App Check will automatically handle verification
-      // No manual reCAPTCHA token needed - it works in the background
+      // Add document with App Check status
       const response = await addDoc(dbRef, {
         name: data.name,
         email: data.email,
@@ -111,8 +159,10 @@ export function ContactSection() {
         message: data.message,
         contactMethod: data.contactMethod,
         timestamp: Timestamp.now(),
-        verified: appCheckEnabled, // App Check automatically verifies
-        appCheckEnabled: appCheckEnabled,
+        appCheckInitialized: appCheckInitialized,
+        appCheckError: appCheckError,
+        userAgent: navigator.userAgent,
+        url: window.location.href,
       })
 
       if (response.id) {
@@ -183,10 +233,20 @@ export function ContactSection() {
                   ) : (
                     <>
                       <span>Send us a message</span>
-                      {appCheckEnabled && (
+                      {appCheckInitialized ? (
                         <div className="flex items-center space-x-1 bg-green-50 px-2 py-1 rounded-full">
                           <Shield className="h-3 w-3 text-green-600" />
                           <span className="text-xs text-green-700 font-medium">Protected</span>
+                        </div>
+                      ) : appCheckError ? (
+                        <div className="flex items-center space-x-1 bg-red-50 px-2 py-1 rounded-full">
+                          <AlertCircle className="h-3 w-3 text-red-600" />
+                          <span className="text-xs text-red-700 font-medium">Security Issue</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-1 bg-yellow-50 px-2 py-1 rounded-full">
+                          <Clock className="h-3 w-3 text-yellow-600" />
+                          <span className="text-xs text-yellow-700 font-medium">Initializing</span>
                         </div>
                       )}
                     </>
@@ -194,6 +254,22 @@ export function ContactSection() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* App Check Error Display */}
+                {appCheckError && (
+                  <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-start space-x-3">
+                      <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                      <div>
+                        <p className="text-yellow-800 font-medium">Security Notice</p>
+                        <p className="text-yellow-700 text-sm">{appCheckError}</p>
+                        <p className="text-yellow-700 text-xs mt-1">
+                          Form will still work, but security features may be limited.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {submitStatus === 'error' && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3">
                     <AlertCircle className="h-5 w-5 text-red-600" />
@@ -218,6 +294,7 @@ export function ContactSection() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+                    {/* Rest of your form JSX remains the same */}
                     {/* Name and Email Row */}
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -376,12 +453,15 @@ export function ContactSection() {
                       )}
                     </Button>
 
-                    {/* App Check Protection Notice */}
-                    {appCheckEnabled && (
-                      <p className="text-xs text-center text-muted-foreground">
-                        This form is protected by Firebase App Check with reCAPTCHA v3
+                    {/* App Check Status Notice */}
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">
+                        {appCheckInitialized 
+                          ? "This form is protected by Firebase App Check with reCAPTCHA v3"
+                          : "Security protection is initializing..."
+                        }
                       </p>
-                    )}
+                    </div>
 
                     {/* Form Footer */}
                     <p className="text-xs text-muted-foreground text-center">
@@ -401,14 +481,13 @@ export function ContactSection() {
             </Card>
           </motion.div>
 
-          {/* Contact Info - Enhanced */}
+          {/* Contact Info - Same as before */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="space-y-8"
           >
-            {/* Contact Methods */}
             <div className="space-y-6">
               {contactInfo.map((info, index) => (
                 <motion.div
