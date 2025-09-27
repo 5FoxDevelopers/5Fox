@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { db } from "@/lib/firebase"
+import app from "@/lib/firebase"
 import { collection, addDoc, Timestamp } from "firebase/firestore"
 import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check"
 
@@ -93,8 +94,6 @@ export function ContactSection() {
           console.log('App Check debug mode enabled for development')
         }
 
-        // Initialize App Check
-        const { app } = await import('@/lib/firebase')
         const appCheck = initializeAppCheck(app, {
           provider: new ReCaptchaV3Provider(siteKey),
           isTokenAutoRefreshEnabled: true,
