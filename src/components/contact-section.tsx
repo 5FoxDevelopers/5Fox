@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Mail, Phone, MapPin, Send, Clock, Users, CheckCircle, AlertCircle } from "lucide-react"
+import { Mail, Phone, MapPin, Send, Clock, Users, CheckCircle, AlertCircle, Shield } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { db } from "@/lib/firebase"
 import { collection, addDoc, Timestamp } from "firebase/firestore"
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 
 // Zod validation schema
 const contactFormSchema = z.object({
@@ -67,8 +66,16 @@ export function ContactSection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | 'app-check-failed' | null>(null)
+  const [appCheckEnabled, setAppCheckEnabled] = useState(false)
   const dbRef = collection(db, "contacts")
-  const { executeRecaptcha } = useGoogleReCaptcha()
+
+  // Check if App Check is enabled
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+      setAppCheckEnabled(true)
+    }
+  }, [])
 
   const {
     register,
@@ -88,26 +95,14 @@ export function ContactSection() {
     },
   })
 
-  // Watch message length for character counter
   const messageLength = watch("message")?.length || 0
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      if (!executeRecaptcha) {
-        toast.error("reCAPTCHA not available. Please try again.")
-        return
-      }
+      setSubmitStatus(null)
 
-      // Execute reCAPTCHA
-      const recaptchaToken = await executeRecaptcha('contact_form_submit')
-      
-      if (!recaptchaToken) {
-        toast.error("reCAPTCHA verification failed. Please try again.")
-        return
-      }
-
-      // Here you should verify the token on your backend
-      // For now, we'll proceed with the form submission
+      // Firebase App Check will automatically handle verification
+      // No manual reCAPTCHA token needed - it works in the background
       const response = await addDoc(dbRef, {
         name: data.name,
         email: data.email,
@@ -116,20 +111,34 @@ export function ContactSection() {
         message: data.message,
         contactMethod: data.contactMethod,
         timestamp: Timestamp.now(),
-        recaptchaToken: recaptchaToken, // Store token for backend verification
+        verified: appCheckEnabled, // App Check automatically verifies
+        appCheckEnabled: appCheckEnabled,
       })
 
       if (response.id) {
         setIsSubmitted(true)
+        setSubmitStatus('success')
         reset()
         toast.success("Message sent successfully! We'll get back to you soon.")
+        
         setTimeout(() => setIsSubmitted(false), 5000)
       } else {
         throw new Error('Failed to send message')
       }
-    } catch (error) {
-      toast.error("Failed to send message. Please try again.")
+    } catch (error: any) {
       console.error('Form submission error:', error)
+      
+      if (error.code === 'failed-precondition') {
+        setSubmitStatus('app-check-failed')
+        toast.error("Security verification failed. Please refresh the page and try again.")
+      } else {
+        setSubmitStatus('error')
+        toast.error("Failed to send message. Please try again.")
+      }
+    } finally {
+      setTimeout(() => {
+        setSubmitStatus(null)
+      }, 10000)
     }
   }
 
@@ -172,11 +181,33 @@ export function ContactSection() {
                       Message Sent Successfully!
                     </>
                   ) : (
-                    "Send us a message"
+                    <>
+                      <span>Send us a message</span>
+                      {appCheckEnabled && (
+                        <div className="flex items-center space-x-1 bg-green-50 px-2 py-1 rounded-full">
+                          <Shield className="h-3 w-3 text-green-600" />
+                          <span className="text-xs text-green-700 font-medium">Protected</span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {submitStatus === 'error' && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3">
+                    <AlertCircle className="h-5 w-5 text-red-600" />
+                    <p className="text-red-800">Failed to send message. Please try again.</p>
+                  </div>
+                )}
+
+                {submitStatus === 'app-check-failed' && (
+                  <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg flex items-center space-x-3">
+                    <AlertCircle className="h-5 w-5 text-orange-600" />
+                    <p className="text-orange-800">Security verification failed. Please refresh the page and try again.</p>
+                  </div>
+                )}
+
                 {isSubmitted ? (
                   <div className="text-center py-8">
                     <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
@@ -200,6 +231,7 @@ export function ContactSection() {
                           className={errors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                           aria-describedby={errors.name ? "name-error" : undefined}
                           aria-invalid={errors.name ? "true" : "false"}
+                          disabled={isSubmitting}
                         />
                         {errors.name && (
                           <p id="name-error" role="alert" className="text-sm text-red-600 flex items-center gap-1">
@@ -221,6 +253,7 @@ export function ContactSection() {
                           className={errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}
                           aria-describedby={errors.email ? "email-error" : undefined}
                           aria-invalid={errors.email ? "true" : "false"}
+                          disabled={isSubmitting}
                         />
                         {errors.email && (
                           <p id="email-error" role="alert" className="text-sm text-red-600 flex items-center gap-1">
@@ -240,6 +273,7 @@ export function ContactSection() {
                         id="company"
                         {...register("company")}
                         placeholder="Your Company Name"
+                        disabled={isSubmitting}
                       />
                     </div>
 
@@ -255,6 +289,7 @@ export function ContactSection() {
                         className={errors.subject ? "border-red-500 focus-visible:ring-red-500" : ""}
                         aria-describedby={errors.subject ? "subject-error" : undefined}
                         aria-invalid={errors.subject ? "true" : "false"}
+                        disabled={isSubmitting}
                       />
                       {errors.subject && (
                         <p id="subject-error" role="alert" className="text-sm text-red-600 flex items-center gap-1">
@@ -276,6 +311,7 @@ export function ContactSection() {
                               value={method.value}
                               id={`contact-${method.value}`}
                               className="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                              disabled={isSubmitting}
                             />
                             <Label 
                               htmlFor={`contact-${method.value}`}
@@ -310,6 +346,7 @@ export function ContactSection() {
                         className={errors.message ? "border-red-500 focus-visible:ring-red-500" : ""}
                         aria-describedby={errors.message ? "message-error" : undefined}
                         aria-invalid={errors.message ? "true" : "false"}
+                        disabled={isSubmitting}
                       />
                       {errors.message && (
                         <p id="message-error" role="alert" className="text-sm text-red-600 flex items-center gap-1">
@@ -323,7 +360,7 @@ export function ContactSection() {
                     <Button
                       type="submit"
                       size="lg"
-                      disabled={isSubmitting || !executeRecaptcha}
+                      disabled={isSubmitting || !isValid}
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
@@ -339,37 +376,21 @@ export function ContactSection() {
                       )}
                     </Button>
 
-                    {/* reCAPTCHA notice */}
-                    <p className="text-xs text-muted-foreground text-center">
-                      This site is protected by reCAPTCHA and the Google{" "}
-                      <a 
-                        href="https://policies.google.com/privacy" 
-                        className="text-primary hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Privacy Policy
-                      </a>{" "}
-                      and{" "}
-                      <a 
-                        href="https://policies.google.com/terms" 
-                        className="text-primary hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Terms of Service
-                      </a>{" "}
-                      apply.
-                    </p>
+                    {/* App Check Protection Notice */}
+                    {appCheckEnabled && (
+                      <p className="text-xs text-center text-muted-foreground">
+                        This form is protected by Firebase App Check with reCAPTCHA v3
+                      </p>
+                    )}
 
                     {/* Form Footer */}
                     <p className="text-xs text-muted-foreground text-center">
                       By submitting this form, you agree to our{" "}
-                      <a href="/privacy" className="text-primary hover:underline">
+                      <a href="/privacy-policy" className="text-primary hover:underline">
                         Privacy Policy
                       </a>{" "}
                       and{" "}
-                      <a href="/terms" className="text-primary hover:underline">
+                      <a href="/privacy-policy" className="text-primary hover:underline">
                         Terms of Service
                       </a>
                       .

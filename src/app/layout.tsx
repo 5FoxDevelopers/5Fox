@@ -7,6 +7,8 @@ import { ThemeProvider } from "next-themes"
 
 import { Suspense } from "react"
 import "./globals.css"
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "5fox - IT Services & Solutions",
@@ -29,7 +31,9 @@ export default function RootLayout({
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
           <Suspense fallback={null}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+            <Navbar/>
             {children}
+            <Footer/>
           </ThemeProvider>
           <Analytics />
         </Suspense>
