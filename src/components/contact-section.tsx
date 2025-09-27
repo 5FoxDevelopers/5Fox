@@ -16,8 +16,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { db } from "@/lib/firebase"
 import { collection, addDoc, Timestamp } from "firebase/firestore"
-import { RecaptchaVerifier } from "firebase/auth"
-import { auth } from "@/lib/firebase"
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 
 // Zod validation schema
 const contactFormSchema = z.object({
@@ -56,9 +55,7 @@ const contactInfo = [
     value: "+91 84375 16789",
     link: "tel:+918437516789",
   },
-
 ]
-
 
 const contactMethods = [
   { value: "email", label: "Email" },
@@ -70,10 +67,8 @@ export function ContactSection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const dbRef=collection(db,"contacts");
-    const [recaptchaVerifier, setRecaptchaVerifier] =
-    useState<RecaptchaVerifier | null>(null);
-
+  const dbRef = collection(db, "contacts")
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   const {
     register,
@@ -83,7 +78,7 @@ export function ContactSection() {
     watch,
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
-    mode: "onBlur", // Validate on blur for better UX
+    mode: "onBlur",
     defaultValues: {
       name: "",
       email: "",
@@ -96,29 +91,24 @@ export function ContactSection() {
   // Watch message length for character counter
   const messageLength = watch("message")?.length || 0
 
-    useEffect(() => {
-    const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-      size: "invisible",
-    });
-    setRecaptchaVerifier(verifier);
-    return () => {
-      verifier.clear();
-    };
-  }, []);
-
   const onSubmit = async (data: ContactFormData) => {
     try {
-
-      if (!recaptchaVerifier) {
-        throw new Error("reCAPTCHA verifier not initialized.");
+      if (!executeRecaptcha) {
+        toast.error("reCAPTCHA not available. Please try again.")
+        return
       }
 
-      const recaptchaToken = await recaptchaVerifier.verify();
-      if (!recaptchaToken) {
-        throw new Error("reCAPTCHA verification failed.");
-      }
+      // Execute reCAPTCHA
+      const recaptchaToken = await executeRecaptcha('contact_form_submit')
       
-      const response =await addDoc(dbRef,{
+      if (!recaptchaToken) {
+        toast.error("reCAPTCHA verification failed. Please try again.")
+        return
+      }
+
+      // Here you should verify the token on your backend
+      // For now, we'll proceed with the form submission
+      const response = await addDoc(dbRef, {
         name: data.name,
         email: data.email,
         company: data.company || "",
@@ -126,17 +116,13 @@ export function ContactSection() {
         message: data.message,
         contactMethod: data.contactMethod,
         timestamp: Timestamp.now(),
-      }); 
-
-
-
+        recaptchaToken: recaptchaToken, // Store token for backend verification
+      })
 
       if (response.id) {
         setIsSubmitted(true)
         reset()
         toast.success("Message sent successfully! We'll get back to you soon.")
-        
-
         setTimeout(() => setIsSubmitted(false), 5000)
       } else {
         throw new Error('Failed to send message')
@@ -149,7 +135,6 @@ export function ContactSection() {
 
   return (
     <section id="contact" className="py-24 bg-muted/30" ref={ref}>
-              <div id="recaptcha-container"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -338,7 +323,7 @@ export function ContactSection() {
                     <Button
                       type="submit"
                       size="lg"
-                      disabled={isSubmitting || !isValid}
+                      disabled={isSubmitting || !executeRecaptcha}
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
@@ -353,6 +338,29 @@ export function ContactSection() {
                         </>
                       )}
                     </Button>
+
+                    {/* reCAPTCHA notice */}
+                    <p className="text-xs text-muted-foreground text-center">
+                      This site is protected by reCAPTCHA and the Google{" "}
+                      <a 
+                        href="https://policies.google.com/privacy" 
+                        className="text-primary hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Privacy Policy
+                      </a>{" "}
+                      and{" "}
+                      <a 
+                        href="https://policies.google.com/terms" 
+                        className="text-primary hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Terms of Service
+                      </a>{" "}
+                      apply.
+                    </p>
 
                     {/* Form Footer */}
                     <p className="text-xs text-muted-foreground text-center">
