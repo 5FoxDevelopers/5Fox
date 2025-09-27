@@ -146,7 +146,7 @@ export function ProjectsSection() {
                       <Badge variant="secondary" className="text-xs">
                         {project.category}
                       </Badge>
-                      <div className="flex space-x-1">
+                      {/* <div className="flex space-x-1">
                         {project.link ? (
                           <Button 
                             size="icon" 
@@ -164,7 +164,7 @@ export function ProjectsSection() {
                             <span>Ongoing</span>
                           </div>
                         )}
-                      </div>
+                      </div> */}
                     </div>
                     <h3 className="text-lg font-semibold group-hover:text-primary transition-colors leading-tight">
                       {project.title}
