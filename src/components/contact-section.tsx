@@ -3,7 +3,7 @@
 import type React from "react"
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -14,6 +14,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import { db } from "@/lib/firebase"
+import { collection, addDoc, Timestamp } from "firebase/firestore"
+import { RecaptchaVerifier } from "firebase/auth"
+import { auth } from "@/lib/firebase"
 
 // Zod validation schema
 const contactFormSchema = z.object({
@@ -66,6 +70,10 @@ export function ContactSection() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const dbRef=collection(db,"contacts");
+    const [recaptchaVerifier, setRecaptchaVerifier] =
+    useState<RecaptchaVerifier | null>(null);
+
 
   const {
     register,
@@ -88,23 +96,47 @@ export function ContactSection() {
   // Watch message length for character counter
   const messageLength = watch("message")?.length || 0
 
+    useEffect(() => {
+    const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+      size: "invisible",
+    });
+    setRecaptchaVerifier(verifier);
+    return () => {
+      verifier.clear();
+    };
+  }, []);
+
   const onSubmit = async (data: ContactFormData) => {
     try {
-      // Simulate API call
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
 
-      if (response.ok) {
+      if (!recaptchaVerifier) {
+        throw new Error("reCAPTCHA verifier not initialized.");
+      }
+
+      const recaptchaToken = await recaptchaVerifier.verify();
+      if (!recaptchaToken) {
+        throw new Error("reCAPTCHA verification failed.");
+      }
+      
+      const response =await addDoc(dbRef,{
+        name: data.name,
+        email: data.email,
+        company: data.company || "",
+        subject: data.subject,
+        message: data.message,
+        contactMethod: data.contactMethod,
+        timestamp: Timestamp.now(),
+      }); 
+
+
+
+
+      if (response.id) {
         setIsSubmitted(true)
         reset()
         toast.success("Message sent successfully! We'll get back to you soon.")
         
-        // Reset success state after 5 seconds
+
         setTimeout(() => setIsSubmitted(false), 5000)
       } else {
         throw new Error('Failed to send message')
@@ -117,6 +149,7 @@ export function ContactSection() {
 
   return (
     <section id="contact" className="py-24 bg-muted/30" ref={ref}>
+              <div id="recaptcha-container"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
